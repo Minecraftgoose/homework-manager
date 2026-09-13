@@ -4,9 +4,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>作业管理器（教师端）</title>
 	
-	<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+	<script src="https://fastly.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+	<script src="https://fastly.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+	<script src="https://fastly.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 	<style>
 		* {
 			margin: 0;
@@ -1278,7 +1278,7 @@
 	<div id="loading-overlay" class="loading-overlay active"><div class="loading-card"><div class="loading-spinner"></div><div id="loading-text" class="loading-text">加载中...</div></div></div>
 	<!-- 顶部导航 -->
 	<div class="header">
-		<h1 style="flex: 0 0 auto;">作业管理器<span style="font-size: 16px; color: #28fa9f; margin-left: 8px;">v3.0.0 教师端</span></h1>
+		<h1 style="flex: 0 0 auto;">作业管理器<span style="font-size: 16px; color: #28fa9f; margin-left: 8px;">v3.1.0 教师端</span></h1>
 		<select id="class-select" class="header-class-select" style="flex: 0 0 auto; margin-left: 12px;" onchange="onClassSelectChange(this.value)"><option value="" disabled selected>请先在设置中绑定班级</option></select>
 		<button class="theme-toggle" onclick="toggleTheme()" title="切换深色/浅色模式" style="position: relative; margin-left: 12px;">
 			<span class="moon-icon">🌙</span>
@@ -1383,7 +1383,7 @@
 						</div>
 						<div class="checkbox-row">
 							<input type="checkbox" id="cls-auto-delete-daily">
-							<label for="cls-auto-delete-daily" title="勾选后，每天自动删除未锁定作业项">每日自动删除作业</label>
+							<label for="cls-auto-delete-daily" title="勾选后由云端数据库每天自动删除未锁定作业项（需已在云端配置定时任务）">每日自动删除作业</label>
 						</div>
 						<div style="text-align: right;">
 							<button class="btn btn-success" onclick="saveClassSettings()">保存</button>
@@ -1468,35 +1468,27 @@
 						<div class="changelog-item">
 							<!-- 头部区域 -->
 							<div class="changelog-header">
-								<span class="changelog-version-tag">v3.0.0</span>
-								<span class="changelog-date">2026-09-06</span>
+								<span class="changelog-version-tag">v3.1.0</span>
+								<span class="changelog-date">2026-09-13</span>
 							</div>
 							<!-- 内容主体 -->
 							<div class="changelog-body">
 								<div class="changelog-section">
 									<div class="section-label">✨ 新增功能</div>
 									<ul class="changelog-list">
-										<li>原单一版本拆分为两个独立版本：
-											<ul class="changelog-sublist">
-												<li><strong>教师端</strong>：面向教师办公与多班管理，支持绑定多个云班级、批量布置、多班级导出</li>
-												<li><strong>课堂端</strong>：面向教室大屏与课堂场景，仅支持绑定单个云班级</li>
-											</ul>
-										</li>
-										<li>新增深色 / 浅色主题切换按钮，主题状态持久化保存</li>
-										<li>启动时自动检查最新版本，发现新版本时弹窗提示并提供下载入口</li>
-										<li>应用启动、切换班级等操作时显示加载动画</li>
-										<li>教师端新增批量布置作业、发布公告功能</li>
-										<li>教师端新增多班级批量导出与 Excel 表格格式导出</li>
-										<li>课堂端新增晚自习模式，全屏展示作业内容并实时显示时间</li>
+										<li>新增「作业管理器（本地）」独立版本</li>
+										<li>教师端、课堂端新增「云端作业变更冲突检测」</li>
+										<li>更新提示弹窗新增 Gitee 备用下载地址，便于 GitHub 访问缓慢时下载</li>
 									</ul>
 								</div>
 								<div class="changelog-section">
-									<div class="section-label">⚙️ 功能调整</div>
+									<div class="section-label">🛠 修复与优化</div>
 									<ul class="changelog-list">
-										<li>原「本地班级」功能删去，全面改为云端班级管理，未绑定班级时无法进行班级操作</li>
-										<li>公告系统由单段文本升级为多条公告列表</li>
-										<li>部分文案中文化</li>
-										<li>界面UI升级，提升使用体验</li>
+										<li>教师端批量布置容错增强</li>
+										<li>CDN 资源切换至 fastly.jsdelivr.net 镜像，提升部分网络环境下的加载稳定性</li>
+										<li>预览作业等减少 innerHTML 拼接，增强转义与安全性</li>
+										<li>降低多人/多端同时编辑同一班级时，后保存无提示覆盖云端内容的风险</li>
+										<li>修复其他已知问题，提升使用稳定性</li>
 									</ul>
 								</div>
 							</div>
@@ -1535,10 +1527,59 @@
 					<div>最新版本：<span id="update-remote-version" style="font-weight: 600; color: #4F46E5;"></span></div>
 					<div id="update-release-notes" style="margin-top: 12px; padding: 12px; background: var(--theme-section-bg, #f9fafb); border-radius: 6px; font-size: 13px; white-space: pre-wrap; word-break: break-word; max-height: 200px; overflow-y: auto;"></div>
 				</div>
+				<div style="margin-top: 12px; padding: 10px 12px; background: var(--theme-section-bg, #f9fafb); border-left: 3px solid #4F46E5; border-radius: 6px; font-size: 13px; line-height: 1.7; color: var(--theme-text-muted, #6b7280);">
+					<div style="font-weight: 600; color: var(--theme-text-primary, #333); margin-bottom: 4px;">💡 备用下载地址（Gitee）</div>
+					<div>若 GitHub 访问缓慢或无法打开，可使用备用网址下载：</div>
+					<a href="https://gitee.com/homework_manager/homework-manager" target="_blank" rel="noopener" style="color: #4F46E5; word-break: break-all;">gitee.com/homework_manager/homework-manager</a>
+	 			</div>
 				<div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end;">
 					<button class="btn btn-secondary" onclick="closeUpdateModal()">暂不更新</button>
 					<a id="update-release-link" href="#" target="_blank" class="btn btn-success" style="text-decoration: none; display: inline-block;">前往下载</a>
 				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 云端作业变更冲突提示 -->
+	<div id="cloud-conflict-modal" class="modal">
+		<div class="modal-content" style="width: 480px; max-width: 90%; height: auto;">
+			<div class="modal-header">
+				<h2 style="text-align: center; flex: 1;">⚠️ 云端作业已更新</h2>
+				<span class="close-modal" onclick="closeCloudConflictWarning()">×</span>
+			</div>
+			<div style="font-size: 15px; line-height: 1.8; color: var(--theme-text-primary, #333);">
+				当前班级的云端作业已被修改，而你正在编辑作业，界面中显示的内容仍是修改前的版本。
+			</div>
+			<div style="margin-top: 14px; padding: 12px; border-radius: 6px; background: var(--theme-section-bg, #f9fafb); border-left: 4px solid #F59E0B; font-size: 13px; line-height: 1.9; color: var(--theme-text-secondary, #374151);">
+				· 如果继续保存，将会<b>覆盖云端的最新内容</b>。<br>
+				· 建议<b>刷新页面</b>后重新编辑，以免丢失他人的修改。
+			</div>
+			<div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end;">
+				<button class="btn" style="background-color: #e5e7eb; color: #374151;" onclick="closeCloudConflictWarning()">继续编辑</button>
+				<button class="btn btn-warning" onclick="refreshAfterCloudConflict()">刷新页面</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 保存前的云端校验：上传前重新读取云端数据，发现作业已被改动 -->
+	<div id="save-conflict-modal" class="modal">
+		<div class="modal-content" style="width: 500px; max-width: 90%; height: auto;">
+			<div class="modal-header">
+				<h2 style="text-align: center; flex: 1;">⚠️ 保存前检测到云端变更</h2>
+				<span class="close-modal" onclick="closeSaveConflictWarning()">×</span>
+			</div>
+			<div style="font-size: 15px; line-height: 1.8; color: var(--theme-text-primary, #333);">
+				准备上传时重新读取了云端数据，发现当前班级的作业在你编辑期间已被修改。<br>
+				如果继续保存，将会<b>覆盖云端的最新内容</b>，本次上传已暂停。
+			</div>
+			<div style="margin-top: 14px; padding: 12px; border-radius: 6px; background: var(--theme-section-bg, #f9fafb); border-left: 4px solid #F59E0B; font-size: 13px; line-height: 1.9; color: var(--theme-text-secondary, #374151);">
+				· 建议选择<b>刷新页面</b>，查看云端最新内容后重新编辑（你这次的改动尚未上传）。<br>
+				· 选择<b>继续编辑</b>可留在当前页面继续修改，稍后再次保存时仍会重新校验一次。
+			</div>
+			<div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; flex-wrap: wrap;">
+				<button class="btn" style="background-color: #e5e7eb; color: #374151;" onclick="closeSaveConflictWarning()">继续编辑</button>
+				<button class="btn btn-warning" onclick="refreshAfterSaveConflict()">刷新页面</button>
+				<button class="btn btn-danger" onclick="confirmSaveOverwrite()">仍然覆盖保存</button>
 			</div>
 		</div>
 	</div>
@@ -1580,6 +1621,21 @@
 			</div>
 			<div style="text-align: right; margin-top: 20px;">
 				<button id="batch-sync-btn" class="btn btn-success" onclick="submitBatch()">同步到选中班级</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 批量同步结果（含失败班级与重试入口） -->
+	<div id="batch-result-modal" class="modal">
+		<div class="modal-content" style="width: 480px; max-width: 90%; height: auto;">
+			<div class="modal-header">
+				<h2 style="text-align: center; flex: 1;" id="batch-result-title">批量同步结果</h2>
+				<span class="close-modal" onclick="closeBatchResultDialog()">×</span>
+			</div>
+			<div id="batch-result-body" style="font-size: 15px; line-height: 1.8; color: var(--theme-text-primary, #333);"></div>
+			<div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end;">
+				<button class="btn" style="background-color: #e5e7eb; color: #374151;" onclick="closeBatchResultDialog()">关闭</button>
+				<button class="btn btn-warning" id="batch-retry-btn" onclick="retryFailedBatch()">重试失败班级</button>
 			</div>
 		</div>
 	</div>
@@ -1633,7 +1689,7 @@
 
 		const APP_CONFIG = {
 			"appName": "作业管理器（教师端）",
-			"version": "v3.0.0"
+			"version": "v3.1.0"
 		};
 
 		function showLoadingOverlay(text = '加载中...') {
@@ -1682,6 +1738,97 @@
 		let boundClasses = [];
 		let currentClassBindCode = null;
 		let sbRealtimeChannel = null;
+		let lastSbError = null;              // 最近一次 Supabase 读写失败的原因（成功则清空）
+
+		/* ==================== 批量同步：失败收集与重试 ==================== */
+		let batchRetryContext = null;        // { type, newHomeworks, rawText, failedCodes }，供「重试失败班级」使用
+
+		/* ==================== 云端作业变更冲突检测 ==================== */
+		let cloudHomeworkSignature = null;   // 最近一次已知的云端作业数据指纹
+		let cloudConflictPending = false;    // 编辑作业期间收到云端变更且尚未处理
+
+		// 生成与科目/字段顺序无关的作业数据指纹，用于判断云端作业是否被改动
+		function homeworkSignature(rawHw) {
+			const src = rawHw || {};
+			const out = {};
+			subjects.forEach(subject => {
+				if (subject === "全部") return;
+				const item = src[subject] || {};
+				const list = Array.isArray(item.homeworks) ? item.homeworks : [];
+				out[subject] = list.map(hw => [
+					String((hw && hw.content) || ""),
+					String((hw && hw.estimatedTime) || ""),
+					String((hw && hw.submitTime) || ""),
+					(hw && hw.locked) ? 1 : 0
+				]);
+			});
+			return JSON.stringify(out);
+		}
+
+		// 是否正处于作业编辑状态（“全部”为预览模式，不算编辑）
+		function isHomeworkEditing() {
+			return !!currentSubject && currentSubject !== "全部"
+				&& elements.editMode && elements.editMode.style.display !== 'none';
+		}
+
+		function showCloudConflictWarning() {
+			cloudConflictPending = true;
+			const modal = document.getElementById('cloud-conflict-modal');
+			if (modal) modal.classList.add('active');
+		}
+
+		function closeCloudConflictWarning() {
+			const modal = document.getElementById('cloud-conflict-modal');
+			if (modal) modal.classList.remove('active');
+		}
+
+		function refreshAfterCloudConflict() {
+			window.location.reload();
+		}
+
+		/* ==================== 上传前的最后一次云端校验 ====================
+		   实时推送与轮询都可能漏掉变更，所以在真正写云端之前再取一次数据比对：
+		   若云端作业已被改动，就中止本次上传，交给用户决定是否覆盖。 */
+		let pendingSaveRetry = null;   // 「仍然覆盖保存」要重跑的动作
+
+		async function verifyCloudBeforeUpload() {
+			// 未配置云端时保持原有行为（uploadHomeworkToSb 自己会直接返回），不要拦在这里
+			if (!ensureSupabase()) return { ok: true, row: undefined };
+			const row = await fetchSbRow(currentClassBindCode);
+			if (lastSbError) return { ok: false, readFailed: true, row: undefined };
+			const incomingSig = homeworkSignature((row && row.homework_data) || {});
+			if (cloudHomeworkSignature != null && incomingSig !== cloudHomeworkSignature) {
+				return { ok: false, readFailed: false, row };
+			}
+			return { ok: true, row };
+		}
+
+		function showSaveConflictWarning(retryAction) {
+			pendingSaveRetry = typeof retryAction === "function" ? retryAction : null;
+			const modal = document.getElementById('save-conflict-modal');
+			if (modal) modal.classList.add('active');
+		}
+
+		function closeSaveConflictWarning() {
+			pendingSaveRetry = null;
+			const modal = document.getElementById('save-conflict-modal');
+			if (modal) modal.classList.remove('active');
+		}
+
+		// 「仍然覆盖保存」：用户已明确确认，重跑刚才被中止的上传
+		function confirmSaveOverwrite() {
+			const act = pendingSaveRetry;
+			pendingSaveRetry = null;
+			const modal = document.getElementById('save-conflict-modal');
+			if (modal) modal.classList.remove('active');
+			closeCloudConflictWarning();
+			cloudConflictPending = false;
+			if (typeof act === "function") act();
+		}
+
+		function refreshAfterSaveConflict() {
+			window.location.reload();
+		}
 
 		const LS_KEYS = {
 			global: "homeworkManagerGlobalSettings",
@@ -1691,8 +1838,13 @@
 			sbKey: "homeworkManagerSupabaseKey"
 		};
 
-		function autoDeleteLastRunKey(bindCode) {
-			return "homeworkManagerAutoDeleteLastRun_" + (bindCode || "");
+		/* 「每日自动删除作业」由云端数据库的定时任务执行（读取 settings.autoDeleteDaily）。
+		   前端只负责把这个开关标记进云端数据，不再在本地执行删除，避免与云端任务冲突。 */
+		function withAutoDeleteMark(settings) {
+			return {
+				...(settings || {}),
+				autoDeleteDaily: !!classSettings.autoDeleteDaily
+			};
 		}
 
 		function getLocal(key, fallback) {
@@ -1737,17 +1889,19 @@
 
 		async function fetchSbRow(bindCode) {
 			const client = ensureSupabase();
-			if (!client) return null;
+			if (!client) { lastSbError = "未配置 Supabase 连接（请检查项目地址与接口密钥）"; return null; }
 			const { data, error } = await client.from("class_data").select("*").eq("bind_code", bindCode).limit(1);
-			if (error) return null;
+			if (error) { lastSbError = error.message || String(error); return null; }
+			lastSbError = null;
 			return data && data.length ? data[0] : null;
 		}
 
 		async function upsertSbRow(row) {
 			const client = ensureSupabase();
-			if (!client) return null;
+			if (!client) { lastSbError = "未配置 Supabase 连接（请检查项目地址与接口密钥）"; return null; }
 			const { data, error } = await client.from("class_data").upsert(row, { onConflict: "bind_code" }).select();
-			if (error) { console.error("upsertSbRow error", error); return null; }
+			if (error) { lastSbError = error.message || String(error); console.error("upsertSbRow error", error); return null; }
+			lastSbError = null;
 			return data && data.length ? data[0] : null;
 		}
 
@@ -1894,9 +2048,6 @@
 			const s = await fetchClassSettings(currentClassBindCode);
 			if (s) classSettings = {...DEFAULT_CLASS_SETTINGS, ...s};
 			if (reloadHomework) await reloadHomeworkForCurrentClass();
-			if (reloadHomework && currentClassBindCode) {
-				await runDailyAutoDeleteIfNeeded();
-			}
 			updatePreview();
 			updateClassSettingsUI();
 			const contentDiv = document.getElementById('announcement-content');
@@ -1908,8 +2059,12 @@
 
 		async function reloadHomeworkForCurrentClass() {
 			unsubscribeRealtime();
+			stopEditModeCloudWatch();
 			initHomeworkData();
+			cloudConflictPending = false;
+			closeCloudConflictWarning();
 			if (!currentClassBindCode) {
+				cloudHomeworkSignature = null;
 				ensureHomeworkLockedProperty();
 				return;
 			}
@@ -1922,23 +2077,37 @@
 				}
 			});
 			ensureHomeworkLockedProperty();
+			// 记录本次读取到的云端作业基线
+			cloudHomeworkSignature = homeworkSignature(hw);
 			setupRealtime();
 		}
 
-		async function uploadHomeworkToSb() {
-			if (!currentClassBindCode) return;
+		/* prefetchedRow：上传前校验时刚取回的行，直接复用可省一次读取，也保证「最后一次读到的
+		   云端数据」就是写入时所依据的版本；传 undefined 表示未校验过，函数内部自行读取。 */
+		async function uploadHomeworkToSb(prefetchedRow) {
+			// 调用方可能已拉起「正在校验云端数据...」遮罩，提前退出时要顺手关掉，否则会一直盖在页面上
+			if (!currentClassBindCode) { hideLoadingOverlay(); return; }
 			const client = ensureSupabase();
-			if (!client) return;
-			const row = await fetchSbRow(currentClassBindCode);
-			const newRow = {
-				bind_code: currentClassBindCode,
-				class_name: classSettings.className || (row && row.class_name) || "班级",
-				settings: (row && row.settings) || {},
-				homework_data: homeworkData,
-				announcement: (row && row.announcement) || [],
-				updated_at: new Date().toISOString()
-			};
-			await upsertSbRow(newRow);
+			if (!client) { hideLoadingOverlay(); return; }
+			showLoadingOverlay('正在上传...');
+			try {
+				const row = prefetchedRow === undefined ? await fetchSbRow(currentClassBindCode) : prefetchedRow;
+				const newRow = {
+					bind_code: currentClassBindCode,
+					class_name: classSettings.className || (row && row.class_name) || "班级",
+					settings: withAutoDeleteMark(row && row.settings),
+					homework_data: homeworkData,
+					announcement: (row && row.announcement) || [],
+					updated_at: new Date().toISOString()
+				};
+				// 先更新本地基线，避免自己写入后回传的事件被当作“云端变更”而误报
+				cloudHomeworkSignature = homeworkSignature(homeworkData);
+				cloudConflictPending = false;
+				closeCloudConflictWarning();
+				await upsertSbRow(newRow);
+			} finally {
+				hideLoadingOverlay();
+			}
 		}
 
 		function setupRealtime() {
@@ -1959,14 +2128,29 @@
 								if (s.exportAddDate != null) classSettings.exportAddDate = !!s.exportAddDate;
 								if (s.exportFontSize != null) classSettings.exportFontSize = Number(s.exportFontSize) || DEFAULT_CLASS_SETTINGS.exportFontSize;
 								if (s.autoDeleteDaily != null) classSettings.autoDeleteDaily = !!s.autoDeleteDaily;
+
+								const hwProvided = Object.prototype.hasOwnProperty.call(row, "homework_data");
 								const hw = row.homework_data || {};
-								subjects.forEach(subject => {
-									if (subject !== "全部") {
-										homeworkData[subject] = hw[subject] || { homeworks: [] };
-										if (!homeworkData[subject].homeworks) homeworkData[subject].homeworks = [];
-									}
-								});
-								ensureHomeworkLockedProperty();
+								const incomingSig = hwProvided ? homeworkSignature(hw) : null;
+								const hwChanged = hwProvided && incomingSig !== cloudHomeworkSignature;
+
+								/* 正在编辑作业时收到云端作业变更：不覆盖本地编辑内容，仅弹出警告 */
+								if (hwChanged && isHomeworkEditing()) {
+									cloudHomeworkSignature = incomingSig;
+									showCloudConflictWarning();
+									return;
+								}
+
+								if (hwProvided) {
+									cloudHomeworkSignature = incomingSig;
+									subjects.forEach(subject => {
+										if (subject !== "全部") {
+											homeworkData[subject] = hw[subject] || { homeworks: [] };
+											if (!homeworkData[subject].homeworks) homeworkData[subject].homeworks = [];
+										}
+									});
+									ensureHomeworkLockedProperty();
+								}
 								updateClassSettingsUI();
 								if (currentSubject === "全部") {
 								updatePreview();
@@ -1976,7 +2160,7 @@
 								if (contentDiv && (!editorDiv || editorDiv.style.display !== 'block')) {
 									renderAnnouncementContent(items);
 								}
-							} else {
+							} else if (hwChanged) {
 								updateHomeworkList();
 							}
 							} catch (e) { console.error("realtime apply error", e); }
@@ -1990,6 +2174,41 @@
 				try { sbRealtimeChannel.unsubscribe(); } catch (e) {}
 				sbRealtimeChannel = null;
 			}
+		}
+
+		/* 编辑作业期间必须保持实时订阅，否则收不到云端变更、冲突提示永远不会出现。
+		   仅在尚未订阅时建立连接，已订阅则直接复用，避免重新加入频道造成监听空窗。 */
+		function ensureRealtime() {
+			if (!currentClassBindCode) return;
+			if (sbRealtimeChannel) return;
+			setupRealtime();
+		}
+
+		/* 编辑期间的兜底检测：Realtime 偶发断连或事件丢失时靠轮询发现云端作业变更。
+		   只做“发现并告警”，绝不覆盖本地正在编辑的内容。 */
+		let editWatchTimer = null;
+
+		function stopEditModeCloudWatch() {
+			if (editWatchTimer) { clearInterval(editWatchTimer); editWatchTimer = null; }
+		}
+
+		// 单次兜底检查：云端作业与本地基线不一致即告警
+		async function runEditCloudCheck() {
+			if (!currentClassBindCode || !isHomeworkEditing()) return;
+			try {
+				const row = await fetchSbRow(currentClassBindCode);
+				if (!row || !row.homework_data) return;
+				const sig = homeworkSignature(row.homework_data);
+				if (sig === cloudHomeworkSignature) return;
+				cloudHomeworkSignature = sig;
+				showCloudConflictWarning();
+			} catch (e) { console.error("edit cloud watch error", e); }
+		}
+
+		function startEditModeCloudWatch() {
+			stopEditModeCloudWatch();
+			if (!currentClassBindCode) return;
+			editWatchTimer = setInterval(runEditCloudCheck, 20000);
 		}
 
 		async function onClassSelectChange(code) {
@@ -2038,24 +2257,45 @@
 			boundClasses.forEach(bc => {
 				const card = document.createElement("div");
 				card.className = "bound-class-card";
-				card.innerHTML = `
-					<div class="bc-name">${escapeHtml(bc.className || "班级")}</div>
-					<div class="bc-code-row">
-						<span class="bc-code">${escapeHtml(bc.bindCode)}</span>
-						<button class="bc-copy" title="复制绑定码" onclick="copyTextInline(this,'${bc.bindCode}')">📋</button>
-					</div>
-					<button class="bc-delete" onclick="removeBoundClass('${bc.bindCode}')">移除绑定</button>
-				`;
+
+				const name = document.createElement("div");
+				name.className = "bc-name";
+				name.textContent = bc.className || "班级";
+
+				const codeRow = document.createElement("div");
+				codeRow.className = "bc-code-row";
+
+				const code = document.createElement("span");
+				code.className = "bc-code";
+				code.textContent = bc.bindCode;
+
+				const copy = document.createElement("button");
+				copy.className = "bc-copy";
+				copy.title = "复制绑定码";
+				copy.textContent = "📋";
+				copy.addEventListener("click", () => copyText(bc.bindCode, copy, "✅"));
+
+				const del = document.createElement("button");
+				del.className = "bc-delete";
+				del.textContent = "移除绑定";
+				del.addEventListener("click", () => removeBoundClass(bc.bindCode));
+
+				codeRow.append(code, copy);
+				card.append(name, codeRow, del);
 				grid.appendChild(card);
 			});
 		}
 
 		function escapeHtml(s) {
-			return String(s == null ? "" : s)
-				.replace(/&/g, "&amp;")
-				.replace(/</g, "&lt;")
-				.replace(/>/g, "&gt;")
-				.replace(/"/g, "&quot;");
+			const map = {
+				'&': '&amp;',
+				'<': '&lt;',
+				'>': '&gt;',
+				'"': '&quot;',
+				"'": '&#39;',
+				'`': '&#96;'
+			};
+			return String(s == null ? "" : s).replace(/[&<>"'`]/g, c => map[c]);
 		}
 
 		window.copyTextInline = function(btnEl, text) {
@@ -2165,7 +2405,7 @@
 				const data = await resp.json();
 				if (!data || !data.tag_name) return;
 				if (compareVersions(data.tag_name, APP_CONFIG.version) !== 0) {
-					showUpdateModal(data.tag_name, data.html_url || 'https://github.com/lusq5174/homework-manager', data.body || '');
+					showUpdateModal(data.tag_name, data.html_url || 'https://github.vom/lusq5174/homework-manager', data.body || '');
 				}
 			} catch (e) { /* 网络错误静默处理 */ }
 		}
@@ -2244,7 +2484,7 @@
 					optionItem.innerHTML = itemTemplate(item, index);
 				} else {
 					optionItem.innerHTML = `
-						<input type="text" class="option-input" value="${item}" oninput="${updateFunc}(${index}, this.value)">
+						<input type="text" class="option-input" value="${escapeHtml(item)}" oninput="${updateFunc}(${index}, this.value)">
 						<button class="btn btn-danger delete-option-btn" onclick="${deleteFunc}(${index})">删除</button>
 					`;
 				}
@@ -2277,7 +2517,7 @@
 		function generateImportantDatesList() {
 			const dateTemplate = (date, index) => `
 				<input type="text" class="option-input" value="${escapeHtml(date.name)}" placeholder="日期名称" oninput="updateImportantDateName(${index}, this.value)">
-				<input type="date" class="option-input" value="${date.date}" oninput="updateImportantDateDate(${index}, this.value)">
+				<input type="date" class="option-input" value="${escapeHtml(date.date)}" oninput="updateImportantDateDate(${index}, this.value)">
 				<button class="btn btn-danger delete-option-btn" onclick="deleteImportantDate(${index})">删除</button>
 			`;
 			generateOptionsList(elements.importantDatesList, globalSettings.importantDates, null, null, dateTemplate);
@@ -2387,15 +2627,43 @@
 			checkAndStartScroll();
 		}
 
-		async function switchSubject(subject) {
+		async function switchSubject(subject, options) {
+			const opts = options || {};
 			// 无绑定班级时，仅允许"全部"展示提示，其他科目按钮无效
 			if (!currentClassBindCode && subject !== '全部') return;
+			// 切回“全部”即提交保存：若编辑期间云端作业已被改动，先提醒保存会覆盖云端内容
+			if (subject === "全部" && !opts.skipUpload && cloudConflictPending) {
+				const goOn = confirm('当前班级的云端作业已被修改，继续保存将覆盖云端的最新内容。\n建议先刷新页面查看最新内容后重新编辑。\n\n仍要保存并覆盖吗？');
+				if (!goOn) return;
+				cloudConflictPending = false;
+				closeCloudConflictWarning();
+				opts.overwriteConfirmed = true;   // 用户已明确选择覆盖，下面不再重复校验
+			}
+			// 上传前最后从云端取一次数据：编辑期间云端作业若被改动（实时推送可能丢失），这里兜住
+			let verifiedRow;   // undefined = 未做校验，交给上传函数自己再取一次
+			if (subject === "全部" && !opts.skipUpload && !opts.overwriteConfirmed
+				&& currentClassBindCode && currentSubject !== "全部") {
+				showLoadingOverlay('正在校验云端数据...');
+				const v = await verifyCloudBeforeUpload();
+				if (!v.ok) {
+					hideLoadingOverlay();
+					if (v.readFailed) {
+						alert('无法读取云端数据（' + lastSbError + '），为避免覆盖云端内容，本次上传已取消。\n请检查网络后重试。');
+						return;
+					}
+					// 停留编辑态，等用户在弹窗里选择刷新 / 继续编辑 / 仍然覆盖
+					showSaveConflictWarning(() => switchSubject("全部", { overwriteConfirmed: true }));
+					return;
+				}
+				verifiedRow = v.row;
+			}
 			currentSubject = subject;
 			$$('.subject-item').forEach(item => item.classList.remove('active'));
 			const activeItem = document.querySelector(`.subject-item[data-subject="${subject}"]`);
 			if (activeItem) activeItem.classList.add('active');
 
 			if (subject === "全部") {
+				stopEditModeCloudWatch();
 				// 立刻切换到预览模式
 				document.body.classList.add('preview-mode-active');
 				elements.previewMode.style.display = "flex";
@@ -2427,17 +2695,25 @@
 						renderAnnouncementContent(items);
 					});
 					// 后台异步上传，不阻塞UI
-					uploadHomeworkToSb().then(() => {
+					if (opts.skipUpload) {
+						// 应用启动/切换班级加载：只读取云端数据，不回写云端
 						unsubscribeRealtime();
 						setupRealtime();
-					});
+					} else {
+						uploadHomeworkToSb(verifiedRow).then(() => {
+							unsubscribeRealtime();
+							setupRealtime();
+						});
+					}
 				} else {
 					updatePreview();
 					const items = await loadAnnouncement();
 					renderAnnouncementContent(items);
 				}
 			} else {
-				unsubscribeRealtime();
+				// 进入编辑模式不再断开实时订阅：冲突检测依赖它接收云端变更
+				ensureRealtime();
+				startEditModeCloudWatch();
 				document.body.classList.remove('preview-mode-active');
 				elements.previewMode.style.display = "none";
 				elements.editMode.style.display = "flex";
@@ -2471,7 +2747,7 @@
 				try {
 					await applyCurrentClass(true);
 					startImportantDateScroll();
-					await switchSubject("全部");
+					await switchSubject("全部", { skipUpload: true });
 					bindDomEvents();
 					applyVariantUI();
 				} finally {
@@ -2502,6 +2778,7 @@
 
 			bindModalBackdropClose(elements.settingsModal, closeSettings);
 			bindModalBackdropClose(document.getElementById('batch-modal'), closeBatchDialog);
+			bindModalBackdropClose(document.getElementById('batch-result-modal'), closeBatchResultDialog);
 			bindModalBackdropClose(document.getElementById('export-modal'), closeExportDialog);
 
 			document.addEventListener('click', (event) => {
@@ -2531,25 +2808,6 @@
 		}
 
 		init();
-
-		function todayKey() {
-			const d = new Date();
-			return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
-		}
-
-		async function runDailyAutoDeleteIfNeeded() {
-			if (!currentClassBindCode) return;
-			const enabled = !!classSettings.autoDeleteDaily;
-			if (!enabled) return;
-			const today = todayKey();
-			const lastRun = localStorage.getItem(autoDeleteLastRunKey(currentClassBindCode));
-			if (lastRun === today) return;
-			subjects.forEach(subject => {
-				if (subject === "全部" || !homeworkData[subject]) return;
-				homeworkData[subject].homeworks = homeworkData[subject].homeworks.filter(hw => hw.locked);
-			});
-			localStorage.setItem(autoDeleteLastRunKey(currentClassBindCode), today);
-		}
 
 		function initHomeworkData() {
 			subjects.forEach(subject => {
@@ -2715,7 +2973,7 @@
 					upsertSbRow({
 						bind_code: currentClassBindCode,
 						class_name: (row && row.class_name) || classSettings.className,
-						settings: (row && row.settings) || {},
+						settings: withAutoDeleteMark(row && row.settings),
 						homework_data: (row && row.homework_data) || {},
 						announcement: items,
 						updated_at: new Date().toISOString()
@@ -2747,13 +3005,13 @@
 							<button class="btn btn-small" onclick="moveHomeworkDown(${index})" ${index === homeworkData[currentSubject].homeworks.length - 1 ? 'disabled' : ''}><span style="font-size: 14px;">↓</span></button>
 							<button class="btn btn-small btn-lock ${homework.locked ? 'locked' : ''}" onclick="toggleHomeworkLock(${index})"><span style="font-size: 14px;">${homework.locked ? '🔒' : '🔓'}</span></button>
 						</div>
-							<textarea class="homework-content" placeholder="作业内容" oninput="updateHomeworkContent(${index}, this.value)">${homework.content}</textarea>
+							<textarea class="homework-content" placeholder="作业内容" oninput="updateHomeworkContent(${index}, this.value)">${escapeHtml(homework.content)}</textarea>
 							<div style="display: flex; flex-direction: column; width: 118px; gap: 8px;">
 								<div>
-									<input type="text" class="submit-time" placeholder="提交时间" value="${homework.submitTime}" onfocus="showTimeDropdown(this)" onblur="hideTimeDropdown(this, event)" oninput="updateHomeworkSubmitTime(${index}, this.value)" data-index="${index}">
+									<input type="text" class="submit-time" placeholder="提交时间" value="${escapeHtml(homework.submitTime)}" onfocus="showTimeDropdown(this)" onblur="hideTimeDropdown(this, event)" oninput="updateHomeworkSubmitTime(${index}, this.value)" data-index="${index}">
 								</div>
 								<div style="display: flex; align-items: center; gap: 5px;">
-									<input type="text" class="estimated-time" placeholder="预计时间" value="${homework.estimatedTime || ''}" oninput="updateHomeworkEstimatedTime(${index}, this.value)">
+									<input type="text" class="estimated-time" placeholder="预计时间" value="${escapeHtml(homework.estimatedTime || '')}" oninput="updateHomeworkEstimatedTime(${index}, this.value)">
 									<span style="font-size: 14px; color: #6b7280;">分钟</span>
 								</div>
 							</div>
@@ -2878,7 +3136,7 @@
 			titleDiv.style.marginBottom = `${classSettings.exportFontSize * 0.3}px`;
 			titleDiv.style.textAlign = 'left';
 
-			let titleContent = classSettings.exportTitle;
+			let titleContent = escapeHtml(classSettings.exportTitle);
 			if (classSettings.exportAddDate) {
 				const currentDate = new Date().toLocaleDateString('zh-CN', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
 				titleContent += ` <span style="font-size: ${classSettings.exportFontSize * 0.8}px; font-weight: normal; color: #666666;">${currentDate}</span>`;
@@ -2930,14 +3188,14 @@
 									// 第一行
 									if (index === 0) {
 										// 第一项作业第一行
-										displayLine = `<strong>${subjectTitle}：</strong>${homeworkNumber}.${line}`;
+										displayLine = `<strong>${escapeHtml(subjectTitle)}：</strong>${homeworkNumber}.${escapeHtml(line)}`;
 									} else {
 										// 后续作业第一行
-										displayLine = `&thinsp;&thinsp;&thinsp;&thinsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${homeworkNumber}.${line}`;
+										displayLine = `&thinsp;&thinsp;&thinsp;&thinsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${homeworkNumber}.${escapeHtml(line)}`;
 									}
 								} else {
 									// 后续行
-									displayLine = `&thinsp;&thinsp;&thinsp;&thinsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${line}`;
+									displayLine = `&thinsp;&thinsp;&thinsp;&thinsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${escapeHtml(line)}`;
 								}
 								
 								// 检查是否为最后一行
@@ -2945,10 +3203,10 @@
 									// 最后一行：添加提交时间和预计时间
 									let timeElements = '';
 									if (homework.submitTime) {
-										timeElements += `<span class="preview-time" style="font-size: ${classSettings.exportFontSize * 0.8}px; margin-left: ${classSettings.exportFontSize * 0.2}px; padding: ${classSettings.exportFontSize * 0.15}px ${classSettings.exportFontSize * 0.35}px; border-radius: ${classSettings.exportFontSize * 0.25}px; top: ${classSettings.exportFontSize * -0.1}px; background-color: #e0e0e0;">${homework.submitTime}</span>`;
+										timeElements += `<span class="preview-time" style="font-size: ${classSettings.exportFontSize * 0.8}px; margin-left: ${classSettings.exportFontSize * 0.2}px; padding: ${classSettings.exportFontSize * 0.15}px ${classSettings.exportFontSize * 0.35}px; border-radius: ${classSettings.exportFontSize * 0.25}px; top: ${classSettings.exportFontSize * -0.1}px; background-color: #e0e0e0;">${escapeHtml(homework.submitTime)}</span>`;
 									}
 									if (homework.estimatedTime) {
-										timeElements += `<span class="preview-time" style="font-size: ${classSettings.exportFontSize * 0.8}px; margin-left: ${classSettings.exportFontSize * 0.2}px; padding: ${classSettings.exportFontSize * 0.15}px ${classSettings.exportFontSize * 0.35}px; border-radius: ${classSettings.exportFontSize * 0.25}px; top: ${classSettings.exportFontSize * -0.1}px; background-color: #e0e0e0;">${homework.estimatedTime}&thinsp;分钟</span>`;
+										timeElements += `<span class="preview-time" style="font-size: ${classSettings.exportFontSize * 0.8}px; margin-left: ${classSettings.exportFontSize * 0.2}px; padding: ${classSettings.exportFontSize * 0.15}px ${classSettings.exportFontSize * 0.35}px; border-radius: ${classSettings.exportFontSize * 0.25}px; top: ${classSettings.exportFontSize * -0.1}px; background-color: #e0e0e0;">${escapeHtml(homework.estimatedTime)}&thinsp;分钟</span>`;
 									}
 									
 									if (timeElements) {
@@ -3060,7 +3318,7 @@
 				});
 				
 				// 执行清空数据和恢复锁定项的操作
-				const doClear = () => {
+				const doClear = async () => {
 					initHomeworkData();
 					// 恢复锁定的作业项
 					subjects.forEach(subject => {
@@ -3069,8 +3327,18 @@
 						}
 					});
 
+					// 上传前最后从云端取一次数据，发现变更则交给用户决定
+					const v = await verifyCloudBeforeUpload();
+					if (!v.ok) {
+						if (v.readFailed) {
+							alert('无法读取云端数据（' + lastSbError + '），为避免覆盖云端内容，本次上传已取消。\n请检查网络后重试。');
+							return;
+						}
+						showSaveConflictWarning(() => uploadHomeworkToSb());
+						return;
+					}
 					// 上传到云端
-					uploadHomeworkToSb();
+					uploadHomeworkToSb(v.row);
 				};
 				
 				// 如果当前是编辑模式，添加淡出动画
@@ -3240,77 +3508,136 @@
 			if (selectedClasses.length === 0) { alert('请至少选择一个班级'); return; }
 			const type = document.getElementById('batch-type-select').value;
 
+			let newHomeworks = [];
+			let rawText = '';
 			if (type === '公告') {
-				const rawText = document.getElementById('batch-announcement-text').value.trim();
+				rawText = document.getElementById('batch-announcement-text').value.trim();
 				if (!rawText) { alert('请输入公告内容'); return; }
 			} else {
 				const hwRows = document.querySelectorAll('#batch-homework-list .batch-homework-item');
-				const hasContent = Array.from(hwRows).some(row => {
+				hwRows.forEach(row => {
 					const ta = row.querySelector('textarea');
-					return ta && ta.value.trim();
+					const submitInput = row.querySelector('.batch-submit-time-input');
+					const estimatedInput = row.querySelector('.batch-estimated-time-input');
+					const content = ta ? ta.value.trim() : '';
+					if (content) {
+						newHomeworks.push({
+							content: content,
+							estimatedTime: estimatedInput ? estimatedInput.value.trim() : '',
+							submitTime: submitInput ? submitInput.value.trim() : '',
+							locked: false
+						});
+					}
 				});
-				if (!hasContent) { alert('请至少输入一项作业内容'); return; }
+				if (newHomeworks.length === 0) { alert('请至少输入一项作业内容'); return; }
 			}
 
 			setBatchLoading(true);
+			let failed = [];
 			try {
-				if (type === '公告') {
-					const rawText = document.getElementById('batch-announcement-text').value.trim();
-					for (const bindCode of selectedClasses) {
-						try {
-							const row = await fetchSbRow(bindCode);
-							const existingItems = parseAnnouncement(row && row.announcement);
-							existingItems.push({ text: rawText });
-							await upsertSbRow({
-								bind_code: bindCode,
-								class_name: (row && row.class_name) || '班级',
-								settings: (row && row.settings) || {},
-								homework_data: (row && row.homework_data) || {},
-								announcement: existingItems,
-								updated_at: new Date().toISOString()
-							});
-						} catch (e) { console.error('Batch ann sync failed', bindCode, e); }
-					}
-					alert('已同步公告到 ' + selectedClasses.length + ' 个班级');
-				} else {
-					const hwRows = document.querySelectorAll('#batch-homework-list .batch-homework-item');
-					const newHomeworks = [];
-					hwRows.forEach(row => {
-						const ta = row.querySelector('textarea');
-						const submitInput = row.querySelector('.batch-submit-time-input');
-						const estimatedInput = row.querySelector('.batch-estimated-time-input');
-						const content = ta ? ta.value.trim() : '';
-						if (content) {
-							newHomeworks.push({
-								content: content,
-								estimatedTime: estimatedInput ? estimatedInput.value.trim() : '',
-								submitTime: submitInput ? submitInput.value.trim() : '',
-								locked: false
-							});
-						}
-					});
-					for (const bindCode of selectedClasses) {
-						try {
-							const row = await fetchSbRow(bindCode);
-							const hwData = (row && row.homework_data) || {};
-							if (!hwData[type]) hwData[type] = { homeworks: [] };
-							if (!hwData[type].homeworks) hwData[type].homeworks = [];
-							hwData[type].homeworks.push(...newHomeworks.map(h => ({...h})));
-							await upsertSbRow({
-								bind_code: bindCode,
-								class_name: (row && row.class_name) || '班级',
-								settings: (row && row.settings) || {},
-								homework_data: hwData,
-								announcement: (row && row.announcement) || [],
-								updated_at: new Date().toISOString()
-							});
-						} catch (e) { console.error('Batch hw sync failed', bindCode, e); }
-					}
-					alert('已同步作业到 ' + selectedClasses.length + ' 个班级');
-				}
-				closeBatchDialog();
+				failed = await runBatchSync(selectedClasses, type, newHomeworks, rawText);
 			} finally {
 				setBatchLoading(false);
+			}
+			closeBatchDialog();
+			batchRetryContext = failed.length
+				? { type, newHomeworks, rawText, failedCodes: failed.map(f => f.bindCode) }
+				: null;
+			showBatchResultDialog(failed, selectedClasses.length);
+		}
+
+		function batchClassLabel(bindCode) {
+			const bc = boundClasses.find(b => b.bindCode === bindCode);
+			return (bc && bc.className) || bindCode;
+		}
+
+		/* 逐班同步：任一步骤失败都记入失败列表；读取失败时跳过该班，绝不拿不完整的数据覆盖云端 */
+		async function runBatchSync(bindCodes, type, newHomeworks, rawText) {
+			const failed = [];
+			for (const bindCode of bindCodes) {
+				lastSbError = null;
+				const row = await fetchSbRow(bindCode);
+				if (lastSbError) { failed.push({ bindCode, reason: lastSbError }); continue; }
+				let payload;
+				if (type === '公告') {
+					const items = parseAnnouncement(row && row.announcement);
+					items.push({ text: rawText });
+					payload = {
+						bind_code: bindCode,
+						class_name: (row && row.class_name) || '班级',
+						settings: (row && row.settings) || {},
+						homework_data: (row && row.homework_data) || {},
+						announcement: items,
+						updated_at: new Date().toISOString()
+					};
+				} else {
+					const hwData = (row && row.homework_data) || {};
+					if (!hwData[type]) hwData[type] = { homeworks: [] };
+					if (!hwData[type].homeworks) hwData[type].homeworks = [];
+					hwData[type].homeworks.push(...newHomeworks.map(h => ({...h})));
+					// 若同步的是当前班级，先更新本地基线，避免自己写入触发的“云端变更”误报
+					if (bindCode === currentClassBindCode) {
+						cloudHomeworkSignature = homeworkSignature(hwData);
+					}
+					payload = {
+						bind_code: bindCode,
+						class_name: (row && row.class_name) || '班级',
+						settings: (row && row.settings) || {},
+						homework_data: hwData,
+						announcement: (row && row.announcement) || [],
+						updated_at: new Date().toISOString()
+					};
+				}
+				await upsertSbRow(payload);
+				if (lastSbError) failed.push({ bindCode, reason: lastSbError });
+			}
+			return failed;
+		}
+
+		function showBatchResultDialog(failed, total) {
+			const title = document.getElementById('batch-result-title');
+			const body = document.getElementById('batch-result-body');
+			const retryBtn = document.getElementById('batch-retry-btn');
+			if (title) title.textContent = failed.length ? '部分班级同步失败' : '批量同步完成';
+			if (body) {
+				let html = `<div>共 ${total} 个班级，成功 <b style="color:#16A34A;">${total - failed.length}</b> 个，失败 <b style="color:#DC2626;">${failed.length}</b> 个。</div>`;
+				if (failed.length) {
+					html += `<div style="margin-top: 14px; padding: 12px; border-radius: 6px; background: var(--theme-section-bg, #f9fafb); border-left: 4px solid #EF4444; font-size: 13px; line-height: 1.9; color: var(--theme-text-secondary, #374151);">`;
+					html += `<div style="margin-bottom: 6px;">失败的班级：</div>`;
+					failed.forEach(f => {
+						html += `<div>· ${escapeHtml(batchClassLabel(f.bindCode))}（${escapeHtml(f.bindCode)}）</div>`;
+					});
+					const lastReason = failed[failed.length - 1].reason;
+					if (lastReason) html += `<div style="margin-top: 8px;">失败原因：${escapeHtml(lastReason)}</div>`;
+					html += `</div>`;
+					html += `<div style="margin-top: 12px;">其余班级已同步完成，请勿再整批重复提交；点「重试失败班级」只会重试上面这些班级。</div>`;
+				}
+				body.innerHTML = html;
+			}
+			if (retryBtn) retryBtn.style.display = failed.length ? '' : 'none';
+			const modal = document.getElementById('batch-result-modal');
+			if (modal) modal.classList.add('active');
+		}
+
+		function closeBatchResultDialog() {
+			const modal = document.getElementById('batch-result-modal');
+			if (modal) modal.classList.remove('active');
+			batchRetryContext = null;
+		}
+
+		async function retryFailedBatch() {
+			if (!batchRetryContext) return;
+			const { type, newHomeworks, rawText, failedCodes } = batchRetryContext;
+			const retryBtn = document.getElementById('batch-retry-btn');
+			if (retryBtn) { retryBtn.disabled = true; retryBtn.textContent = '重试中...'; }
+			try {
+				const failed = await runBatchSync(failedCodes, type, newHomeworks, rawText);
+				batchRetryContext = failed.length
+					? { type, newHomeworks, rawText, failedCodes: failed.map(f => f.bindCode) }
+					: null;
+				showBatchResultDialog(failed, failedCodes.length);
+			} finally {
+				if (retryBtn) { retryBtn.disabled = false; retryBtn.textContent = '重试失败班级'; }
 			}
 		}
 
